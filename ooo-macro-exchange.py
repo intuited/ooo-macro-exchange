@@ -35,10 +35,10 @@ def connect(uno=uno, host='localhost', port=2002):
     return resolver.resolve(context_url(host=host, port=port))
 
 
-def get_lib_by_name(libraries, library_name, mode='read'):
+def get_lib_by_name(libs, library_name, mode='read'):
     """Get the library named by ``library_name``.
 
-    ``libraries`` is the set of libraries,
+    ``libraries`` is a sequence of libraries,
     as returned by ``Basic.get_doc_lib``.
 
     If ``mode`` is 'write',
