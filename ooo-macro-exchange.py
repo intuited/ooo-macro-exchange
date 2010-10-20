@@ -130,6 +130,16 @@ class Basic:
         return parts
 
 
+    def update(self, doc_name, macro_name, filename):
+        """Update module from ``filename``.
+
+        Returns the updated document.
+        """
+        lib_name, mod_name, procedure = self.parse_name(macro_name)
+        doc, libraries = self.get_doc_lib(doc_name)
+        self.update_module(file_path, libraries, lib_name, mod_name)
+        return doc
+
     def update_and_run(self, doc_name, macro_name, filename):
         """ Update module from filename and run ``macro_name`` in ``doc_name``.
 
@@ -138,9 +148,7 @@ class Basic:
             and executed on the active document.
             Otherwise, it is stored in the document and invoked on that document.
         """
-        lib_name, mod_name, procedure = self.parse_name(macro_name)
-        doc, libraries = self.get_doc_lib(doc_name)
-        self.update_module(file_path, libraries, lib_name, mod_name):
+        doc = self.update(doc_name, macro_name, filename)
         self.run(doc, macro_name)
 
 
