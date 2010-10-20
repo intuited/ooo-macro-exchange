@@ -77,19 +77,8 @@ def get_lib_by_name(libs, library_name, mode='read'):
     return libs.getByName(lib_name)
 
 
-def get_doc_lib(context, service_manager, desktop, doc_name):
-    """Returns (doc, libraries).
-
-    If ``doc_name`` is "application",
-    returns the current document and the app library.
-
-    Raises DocLibLookupError if the a document with the specified name
-    is not found.
-    """
-    if doc_name == 'application':
-        return (get_current_doc(desktop),
-                get_app_lib(context, service_manager))
-
+def get_doc_lib(desktop, doc_name):
+    """Returns (document, library) for ``doc_name``."""
     frames = desktop.getFrames()
     for i in range(frames.getCount()):
         controller = frames.getByIndex(i).getController()
@@ -97,7 +86,22 @@ def get_doc_lib(context, service_manager, desktop, doc_name):
             doc = controller.getModel()
             return doc, doc.BasicLibraries
 
-    raise DocLibLookupError
+    raise DocLibLookupError(doc_name)
+
+def resolve_doc_name(context, service_manager, desktop, doc_name):
+    """Returns (doc, libraries).
+
+    If ``doc_name`` is "application",
+    returns the current document and the app library.
+
+    Raises DocLibLookupError if a document with the specified name
+    is not found.
+    """
+    if doc_name == 'application':
+        return (get_current_doc(desktop),
+                get_app_lib(context, service_manager))
+    return get_doc_lib(desktop, doc_name)
+
 
 script_name_url = (
     'vnd.sun.star.script:{0}?language=Basic&location=document'.format)
@@ -145,7 +149,7 @@ class Basic:
         Returns the updated document.
         """
         lib_name, mod_name, procedure = self.parse_name(macro_name)
-        doc, libraries = get_doc_lib(self.ctx, self.smgr, self.desktop, doc_name)
+        doc, libraries = resolve_doc_name(self.ctx, self.smgr, self.desktop, doc_name)
         self.update_module(source, libraries, lib_name, mod_name)
         return doc
 
