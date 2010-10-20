@@ -1,7 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 import sys
-sys.path.append("/home/asuka/opt/ooo-dev/basis3.2/program")
+import find_ooo
+sys.path.append(find_ooo.find_ooo())
 import uno
 
 def connect():
