@@ -51,8 +51,6 @@ def get_app_lib(context, service_manager):
 def get_current_doc(desktop):
     return desktop.getCurrentComponent()
 
-
-
 def get_lib_by_name(libs, library_name, mode='read'):
     """Get the library named by ``library_name``.
 
