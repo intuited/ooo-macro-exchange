@@ -6,16 +6,11 @@ sys.path.append(find_ooo.find_ooo())
 import uno
 
 def connect():
-    ctx = None
-    try:
-        localctx = uno.getComponentContext()
-        resolver = localctx.getServiceManager().createInstanceWithContext(
-            "com.sun.star.bridge.UnoUrlResolver", localctx)
-        ctx = resolver.resolve(
-            "uno:socket,host=localhost,port=2083;urp;StarOffice.ComponentContext")
-    except:
-        pass
-    return ctx
+    localctx = uno.getComponentContext()
+    resolver = localctx.getServiceManager().createInstanceWithContext(
+        "com.sun.star.bridge.UnoUrlResolver", localctx)
+    return resolver.resolve(
+        "uno:socket,host=localhost,port=2083;urp;StarOffice.ComponentContext")
 
 
 class Basic:
@@ -140,12 +135,8 @@ def parse_arg(args):
         return args[1:]
 
 if __name__ == '__main__':
-
-  ctx = connect()
-  if ctx:
-      file_name, macro_name, bas_name = parse_arg(sys.argv)
-      Basic(ctx).update_and_run(file_name, macro_name, bas_name)
-      #Basic(ctx).update_and_run('Untitled 1', 'Standard.Module1.main',
-      #    '/home/asuka/Desktop/python/moduleA.bas')
-  else:
-      print("failed to connect.")
+    ctx = connect()
+    file_name, macro_name, bas_name = parse_arg(sys.argv)
+    Basic(ctx).update_and_run(file_name, macro_name, bas_name)
+    #Basic(ctx).update_and_run('Untitled 1', 'Standard.Module1.main',
+    #    '/home/asuka/Desktop/python/moduleA.bas')
