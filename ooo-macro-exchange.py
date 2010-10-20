@@ -21,12 +21,18 @@ class IllegalMacroNameError(Exception):
     """Raised if a macro name with less or more than three parts is given."""
 
 
-def connect():
+def connect(uno=uno, host='localhost', port=2002):
+    """Returns a resolved connection context."""
     localctx = uno.getComponentContext()
-    resolver = localctx.getServiceManager().createInstanceWithContext(
-        "com.sun.star.bridge.UnoUrlResolver", localctx)
-    return resolver.resolve(
-        "uno:socket,host=localhost,port=2083;urp;StarOffice.ComponentContext")
+    create_instance = localctx.getServiceManager().createInstanceWithContext
+
+    resolver_class = "com.sun.star.bridge.UnoUrlResolver"
+    resolver = create_instance(resolver_class, localctx)
+
+    context_url = ("uno:socket,host={host},port={port};"
+                   "urp;StarOffice.ComponentContext".format)
+
+    return resolver.resolve(context_url(host=host, port=port))
 
 
 def get_lib_by_name(libraries, library_name, mode='read'):
