@@ -19,21 +19,14 @@ class Basic:
         self.ctx = ctx
         self.smgr = ctx.getServiceManager()
         self.desktop = self.get_desktop()
-        if not self.desktop:
-            raise RuntimeError("maybe illegally initiated.")
 
     def get_desktop(self):
-        desktop = None
-        try:
-            desktop = self.smgr.createInstanceWithContext(
-                "com.sun.star.frame.Desktop", self.ctx)
-        except:
-            pass
-        return desktop
+        create_instance = self.smgr.createInstanceWithContext
+        desktop_class = "com.sun.star.frame.Desktop"
+        return create_instance(desktop_class, self.ctx)
 
     def get_current_doc(self):
-        if self.desktop:
-            return self.desktop.getCurrentComponent()
+        return self.desktop.getCurrentComponent()
 
     def get_app_lib(self):
         lib = None
@@ -58,9 +51,6 @@ class Basic:
         if doc_name == 'application':
             return (self.get_current_doc(),
                     self.get_app_lib(ctx))
-
-        if not self.desktop:
-            return None, None
 
         frames = self.desktop.getFrames()
         for i in range(frames.getCount()):
