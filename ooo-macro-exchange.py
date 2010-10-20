@@ -67,19 +67,14 @@ class Basic:
         if not self.desktop:
             return None, None
 
-        doc = None
-        lib = None
-        frame = self.desktop
-        frames = frame.getFrames()
+        frames = self.desktop.getFrames()
         for i in range(frames.getCount()):
             controller = frames.getByIndex(i).getController()
-            if controller:
-                if controller.getTitle() == doc_name:
-                    doc = controller.getModel()
-                    break
-        if doc:
-            lib = doc.BasicLibraries
-        return doc, lib
+            if controller and controller.getTitle() == doc_name:
+                doc = controller.getModel()
+                return doc, doc.BasicLibraries
+
+        return None, None
 
 
     def update_module(self, file_name, libs, lib_name, mod_name):
