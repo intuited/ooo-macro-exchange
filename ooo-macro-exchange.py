@@ -133,17 +133,19 @@ class Basic:
         return parts
 
 
-    def update_and_run(self, doc_name, name, file_path):
-        """ Update module from file_path and run name macro in the doc_name.
-            if doc_name is 'application', macro is updated in application library
-            and macro is executed on active document. Otherwise, stored in the docuemnt
-            and it is invoked on own document.
+    def update_and_run(self, doc_name, macro_name, filename):
+        """ Update module from filename and run ``macro_name`` in ``doc_name``.
+
+            If doc_name is 'application',
+            the macro is updated in the application library
+            and executed on the active document.
+            Otherwise, it is stored in the document and invoked on that document.
         """
-        lib_name, mod_name, procedure = self.parse_name(name)
+        lib_name, mod_name, procedure = self.parse_name(macro_name)
         doc, libraries = self.get_doc_lib(doc_name)
         if doc and libraries:
             if self.update_module(file_path, libraries, lib_name, mod_name):
-                self.run(doc, name)
+                self.run(doc, macro_name)
             else:
                 print("failed to update the module (%s.%s)" % (lib_name, mod_name))
 
