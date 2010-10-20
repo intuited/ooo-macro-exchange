@@ -82,21 +82,7 @@ class Basic:
         return doc, lib
 
 
-    def read_module(self, file_name):
-        try:
-            f = open(file_name, 'r')
-            s = f.read()
-            f.close()
-            return s
-        except:
-            pass
-        return None
-
     def update_module(self, file_name, libs, lib_name, mod_name):
-        contents = self.read_module(file_name)
-
-        if not contents:
-            raise IOError("maybe file is not exist.")
         if not libs:
             raise RuntimeError("illegal library.")
         if not libs.hasByName(lib_name):
@@ -108,6 +94,10 @@ class Basic:
         lib = libs.getByName(lib_name)
         if not libs.isLibraryLoaded(lib_name):
             libs.loadLibrary(lib_name)
+
+        with open(file_name, 'r') as module_file:
+            contents = module_file.read()
+
         if not lib.hasByName(mod_name):
             lib.insertByName(mod_name, contents)
         else:
