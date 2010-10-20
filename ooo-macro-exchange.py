@@ -29,14 +29,12 @@ class Basic:
         return self.desktop.getCurrentComponent()
 
     def get_app_lib(self):
-        lib = None
-        try:
-            lib = self.smgr.createInstanceWithContext(
-                "com.sun.star.script.ApplicationScriptLibraryContainer", ctx)
-        except:
-            pass
-        return lib
-
+        # TODO: find out if it's possible for an exception to be thrown
+        #       by create_instance in a situation where
+        #       there is legitimately no library for the application.
+        create_instance = self.smgr.createInstanceWithContext
+        library_class = "com.sun.star.script.ApplicationScriptLibraryContainer"
+        return create_instance(library_class, self.ctx)
 
     def get_doc_lib(self, doc_name):
         """Returns (doc, libraries).
