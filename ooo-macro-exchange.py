@@ -9,12 +9,47 @@ class DocLibLookupError(Exception):
     """Raised if document name lookup fails."""
     pass
 
+class ReadonlyLibraryError(Exception):
+    """Raised if an attempt is made to update a readonly library."""
+    pass
+
+class PasswordProtectionError(Exception):
+    """Raised if a password check prevents a library update."""
+    pass
+
+
 def connect():
     localctx = uno.getComponentContext()
     resolver = localctx.getServiceManager().createInstanceWithContext(
         "com.sun.star.bridge.UnoUrlResolver", localctx)
     return resolver.resolve(
         "uno:socket,host=localhost,port=2083;urp;StarOffice.ComponentContext")
+
+
+def get_lib_by_name(libraries, library_name, mode='read'):
+    """Get the library named by ``library_name``.
+
+    ``libraries`` is the set of libraries,
+    as returned by ``Basic.get_doc_lib``.
+
+    If ``mode`` is 'write',
+    the library is checked for write access.
+    """
+    if not libs.hasByName(lib_name):
+        libs.createLibrary(lib_name)
+
+    if mode == 'write':
+        if libs.isLibraryReadOnly(lib_name):
+            raise ReadonlyLibraryError(lib_name)
+
+    if (libs.isLibraryPasswordProtected(lib_name)
+        and not libs.isLibraryPasswordVerified(lib_name):
+        raise PasswordProtectionError(lib_name)
+
+    if not libs.isLibraryLoaded(lib_name):
+        libs.loadLibrary(lib_name)
+
+    return libs.getByName(lib_name)
 
 
 class Basic:
@@ -64,17 +99,8 @@ class Basic:
 
 
     def update_module(self, file_name, libs, lib_name, mod_name):
-        if not libs:
-            raise RuntimeError("illegal library.")
-        if not libs.hasByName(lib_name):
-            libs.createLibrary(lib_name)
-        if libs.isLibraryReadOnly(lib_name):
-            raise RuntimeError("readonly library (%s)" % lib_name)
-        if libs.isLibraryPasswordProtected(lib_name) and not libs.isLibraryPasswordVerified(lib_name):
-            raise RuntimeError("library is protected by the password. (%s)" % lib_name)
-        lib = libs.getByName(lib_name)
-        if not libs.isLibraryLoaded(lib_name):
-            libs.loadLibrary(lib_name)
+        """Update the named module in the named library."""
+        lib = get_lib_by_name(libs, lib_name, 'write')
 
         with open(file_name, 'r') as module_file:
             contents = module_file.read()
@@ -83,7 +109,6 @@ class Basic:
             lib.insertByName(mod_name, contents)
         else:
             lib.replaceByName(mod_name, contents)
-        return True
 
     def run(self, doc, name):
         ret = None
