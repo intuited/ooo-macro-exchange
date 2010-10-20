@@ -5,6 +5,10 @@ import find_ooo
 sys.path.append(find_ooo.find_ooo())
 import uno
 
+class DocLibLookupError(Exception):
+    """Raised if document name lookup fails."""
+    pass
+
 def connect():
     localctx = uno.getComponentContext()
     resolver = localctx.getServiceManager().createInstanceWithContext(
@@ -42,9 +46,8 @@ class Basic:
         If ``doc_name`` is "application",
         returns the current document and the app library.
 
-        Returns None for either or both elements
-        under certain circumstances that the inheritor of this code
-        is not yet aware of.
+        Raises DocLibLookupError if the a document with the specified name
+        is not found.
         """
         if doc_name == 'application':
             return (self.get_current_doc(),
@@ -57,7 +60,7 @@ class Basic:
                 doc = controller.getModel()
                 return doc, doc.BasicLibraries
 
-        return None, None
+        raise DocLibLookupError
 
 
     def update_module(self, file_name, libs, lib_name, mod_name):
@@ -111,11 +114,8 @@ class Basic:
         """
         lib_name, mod_name, procedure = self.parse_name(macro_name)
         doc, libraries = self.get_doc_lib(doc_name)
-        if doc and libraries:
-            if self.update_module(file_path, libraries, lib_name, mod_name):
-                self.run(doc, macro_name)
-            else:
-                print("failed to update the module (%s.%s)" % (lib_name, mod_name))
+        self.update_module(file_path, libraries, lib_name, mod_name):
+        self.run(doc, macro_name)
 
 
 def parse_arg(args):
