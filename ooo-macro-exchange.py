@@ -55,7 +55,7 @@ def get_lib_by_name(libs, library_name, mode='read'):
     """Get the library named by ``library_name``.
 
     ``libraries`` is a sequence of libraries,
-    as returned by ``Basic.get_doc_lib``.
+    as returned by ``get_doc_lib``.
 
     If ``mode`` is 'write',
     the library is checked for write access.
@@ -77,6 +77,28 @@ def get_lib_by_name(libs, library_name, mode='read'):
     return libs.getByName(lib_name)
 
 
+def get_doc_lib(context, service_manager, desktop, doc_name):
+    """Returns (doc, libraries).
+
+    If ``doc_name`` is "application",
+    returns the current document and the app library.
+
+    Raises DocLibLookupError if the a document with the specified name
+    is not found.
+    """
+    if doc_name == 'application':
+        return (get_current_doc(desktop),
+                get_app_lib(context, service_manager))
+
+    frames = desktop.getFrames()
+    for i in range(frames.getCount()):
+        controller = frames.getByIndex(i).getController()
+        if controller and controller.getTitle() == doc_name:
+            doc = controller.getModel()
+            return doc, doc.BasicLibraries
+
+    raise DocLibLookupError
+
 script_name_url = (
     'vnd.sun.star.script:{0}?language=Basic&location=document'.format)
 
@@ -87,28 +109,6 @@ class Basic:
         self.ctx = ctx
         self.smgr = ctx.getServiceManager()
         self.desktop = get_desktop(self.ctx, self.smgr)
-
-    def get_doc_lib(self, doc_name):
-        """Returns (doc, libraries).
-
-        If ``doc_name`` is "application",
-        returns the current document and the app library.
-
-        Raises DocLibLookupError if the a document with the specified name
-        is not found.
-        """
-        if doc_name == 'application':
-            return (get_current_doc(self.desktop),
-                    get_app_lib(self.ctx, self.smgr))
-
-        frames = self.desktop.getFrames()
-        for i in range(frames.getCount()):
-            controller = frames.getByIndex(i).getController()
-            if controller and controller.getTitle() == doc_name:
-                doc = controller.getModel()
-                return doc, doc.BasicLibraries
-
-        raise DocLibLookupError
 
 
     def update_module(self, lines, libs, lib_name, mod_name):
@@ -145,7 +145,7 @@ class Basic:
         Returns the updated document.
         """
         lib_name, mod_name, procedure = self.parse_name(macro_name)
-        doc, libraries = self.get_doc_lib(doc_name)
+        doc, libraries = get_doc_lib(self.ctx, self.smgr, self.desktop, doc_name)
         self.update_module(source, libraries, lib_name, mod_name)
         return doc
 
