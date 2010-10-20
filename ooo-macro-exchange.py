@@ -105,22 +105,25 @@ class Basic:
         raise DocLibLookupError
 
 
-    def update_module(self, file_name, libs, lib_name, mod_name):
+    def update_module(self, lines, libs, lib_name, mod_name):
         """Update the named module in the named library."""
         lib = get_lib_by_name(libs, lib_name, 'write')
 
-        with open(file_name, 'r') as module_file:
-            contents = module_file.read()
+        contents = ''.join(lines)
 
         if not lib.hasByName(mod_name):
             lib.insertByName(mod_name, contents)
         else:
             lib.replaceByName(mod_name, contents)
 
+
+
     def run(self, doc, script_name):
         provider = doc.getScriptProvider()
         script = provider.getScript(script_name_url(script_name))
         return script.invoke((), (), ())
+
+
 
     def parse_name(self, name):
         """Parse macro name."""
@@ -130,17 +133,17 @@ class Basic:
         return parts
 
 
-    def update(self, doc_name, macro_name, filename):
-        """Update module from ``filename``.
+    def push(self, doc_name, macro_name, source):
+        """Pushes the module code for ``macro_name`` from ``source``.
 
         Returns the updated document.
         """
         lib_name, mod_name, procedure = self.parse_name(macro_name)
         doc, libraries = self.get_doc_lib(doc_name)
-        self.update_module(file_path, libraries, lib_name, mod_name)
+        self.update_module(source, libraries, lib_name, mod_name)
         return doc
 
-    def update_and_run(self, doc_name, macro_name, filename):
+    def update_and_run(self, doc_name, macro_name, source):
         """ Update module from filename and run ``macro_name`` in ``doc_name``.
 
             If doc_name is 'application',
@@ -148,7 +151,7 @@ class Basic:
             and executed on the active document.
             Otherwise, it is stored in the document and invoked on that document.
         """
-        doc = self.update(doc_name, macro_name, filename)
+        doc = self.push(doc_name, macro_name, source)
         self.run(doc, macro_name)
 
 
@@ -159,6 +162,7 @@ def parse_arg(args):
 if __name__ == '__main__':
     ctx = connect()
     file_name, macro_name, bas_name = parse_arg(sys.argv)
-    Basic(ctx).update_and_run(file_name, macro_name, bas_name)
+    with open(file_name, 'r') as source_file:
+        Basic(ctx).update_and_run(source_file, macro_name, bas_name)
     #Basic(ctx).update_and_run('Untitled 1', 'Standard.Module1.main',
     #    '/home/asuka/Desktop/python/moduleA.bas')
