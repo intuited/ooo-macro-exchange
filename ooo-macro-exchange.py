@@ -35,6 +35,12 @@ def connect(uno=uno, host='localhost', port=2002):
     return resolver.resolve(context_url(host=host, port=port))
 
 
+def get_desktop(context, service_manager):
+    create_instance = service_manager.createInstanceWithContext
+    desktop_class = "com.sun.star.frame.Desktop"
+    return create_instance(desktop_class, context)
+
+
 def get_lib_by_name(libs, library_name, mode='read'):
     """Get the library named by ``library_name``.
 
@@ -70,12 +76,7 @@ class Basic:
     def __init__(self, ctx):
         self.ctx = ctx
         self.smgr = ctx.getServiceManager()
-        self.desktop = self.get_desktop()
-
-    def get_desktop(self):
-        create_instance = self.smgr.createInstanceWithContext
-        desktop_class = "com.sun.star.frame.Desktop"
-        return create_instance(desktop_class, self.ctx)
+        self.desktop = get_desktop(self.ctx, self.smgr)
 
     def get_current_doc(self):
         return self.desktop.getCurrentComponent()
