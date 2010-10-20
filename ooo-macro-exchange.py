@@ -51,8 +51,22 @@ class Basic:
 
 
     def get_doc_lib(self, doc_name):
+        """Returns (doc, libraries).
+
+        If ``doc_name`` is "application",
+        returns the current document and the app library.
+
+        Returns None for either or both elements
+        under certain circumstances that the inheritor of this code
+        is not yet aware of.
+        """
+        if doc_name == 'application':
+            return (self.get_current_doc(),
+                    self.get_app_lib(ctx))
+
         if not self.desktop:
             return None, None
+
         doc = None
         lib = None
         frame = self.desktop
@@ -126,13 +140,7 @@ class Basic:
             and it is invoked on own document.
         """
         lib_name, mod_name, procedure = self.parse_name(name)
-        libraries = None
-        doc = None
-        if doc_name == 'application':
-            libraries = self.get_app_lib(ctx)
-            doc = self.get_current_doc()
-        else:
-            doc, libraries = self.get_doc_lib(doc_name)
+        doc, libraries = self.get_doc_lib(doc_name)
         if doc and libraries:
             if self.update_module(file_path, libraries, lib_name, mod_name):
                 self.run(doc, name)
