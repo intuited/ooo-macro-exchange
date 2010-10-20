@@ -21,7 +21,7 @@ class IllegalMacroNameError(Exception):
     """Raised if a macro name with less or more than three parts is given."""
 
 
-def connect(uno=uno, host='localhost', port=2002):
+def get_context(uno=uno, host='localhost', port=2002):
     """Returns a resolved connection context."""
     localctx = uno.getComponentContext()
     create_instance = localctx.getServiceManager().createInstanceWithContext
@@ -170,7 +170,7 @@ def parse_arg(args):
         return args[1:]
 
 if __name__ == '__main__':
-    ctx = connect()
+    ctx = get_context()
     file_name, macro_name, bas_name = parse_arg(sys.argv)
     with open(file_name, 'r') as source_file:
         Basic(ctx).update_and_run(source_file, macro_name, bas_name)
