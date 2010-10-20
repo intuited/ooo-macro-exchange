@@ -17,6 +17,9 @@ class PasswordProtectionError(Exception):
     """Raised if a password check prevents a library update."""
     pass
 
+class IllegalMacroNameError(Exception):
+    """Raised if a macro name with less or more than three parts is given."""
+
 
 def connect():
     localctx = uno.getComponentContext()
@@ -50,6 +53,10 @@ def get_lib_by_name(libraries, library_name, mode='read'):
         libs.loadLibrary(lib_name)
 
     return libs.getByName(lib_name)
+
+
+script_name_url = (
+    'vnd.sun.star.script:{0}?language=Basic&location=document'.format)
 
 
 class Basic:
@@ -110,22 +117,16 @@ class Basic:
         else:
             lib.replaceByName(mod_name, contents)
 
-    def run(self, doc, name):
-        ret = None
-        sp = doc.getScriptProvider()
-        try:
-            script = sp.getScript('vnd.sun.star.script:%s?language=Basic&location=document' % name)
-            if script:
-                ret = script.invoke((), (), ())
-        except Exception as e:
-            print(e)
-        return ret
+    def run(self, doc, script_name):
+        provider = doc.getScriptProvider()
+        script = provider.getScript(script_name_url(script_name))
+        return script.invoke((), (), ())
 
     def parse_name(self, name):
-        """parse macro name."""
+        """Parse macro name."""
         parts = name.split('.')
         if len(parts) != 3:
-            raise RuntimeError("Illegal name: %s" % name)
+            raise IllegalMacroNameError(name)
         return parts
 
 
