@@ -40,6 +40,14 @@ def get_desktop(context, service_manager):
     desktop_class = "com.sun.star.frame.Desktop"
     return create_instance(desktop_class, context)
 
+def get_app_lib(context, service_manager):
+    # TODO: find out if it's possible for an exception to be thrown
+    #       by create_instance in a situation where
+    #       there is legitimately no library for the application.
+    create_instance = service_manager.createInstanceWithContext
+    library_class = "com.sun.star.script.ApplicationScriptLibraryContainer"
+    return create_instance(library_class, context)
+
 def get_current_doc(desktop):
     return desktop.getCurrentComponent()
 
@@ -82,14 +90,6 @@ class Basic:
         self.smgr = ctx.getServiceManager()
         self.desktop = get_desktop(self.ctx, self.smgr)
 
-    def get_app_lib(self):
-        # TODO: find out if it's possible for an exception to be thrown
-        #       by create_instance in a situation where
-        #       there is legitimately no library for the application.
-        create_instance = self.smgr.createInstanceWithContext
-        library_class = "com.sun.star.script.ApplicationScriptLibraryContainer"
-        return create_instance(library_class, self.ctx)
-
     def get_doc_lib(self, doc_name):
         """Returns (doc, libraries).
 
@@ -101,7 +101,7 @@ class Basic:
         """
         if doc_name == 'application':
             return (get_current_doc(self.desktop),
-                    self.get_app_lib(ctx))
+                    get_app_lib(self.ctx, self.smgr))
 
         frames = self.desktop.getFrames()
         for i in range(frames.getCount()):
