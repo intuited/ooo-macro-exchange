@@ -40,6 +40,10 @@ def get_desktop(context, service_manager):
     desktop_class = "com.sun.star.frame.Desktop"
     return create_instance(desktop_class, context)
 
+def get_current_doc(desktop):
+    return desktop.getCurrentComponent()
+
+
 
 def get_lib_by_name(libs, library_name, mode='read'):
     """Get the library named by ``library_name``.
@@ -78,9 +82,6 @@ class Basic:
         self.smgr = ctx.getServiceManager()
         self.desktop = get_desktop(self.ctx, self.smgr)
 
-    def get_current_doc(self):
-        return self.desktop.getCurrentComponent()
-
     def get_app_lib(self):
         # TODO: find out if it's possible for an exception to be thrown
         #       by create_instance in a situation where
@@ -99,7 +100,7 @@ class Basic:
         is not found.
         """
         if doc_name == 'application':
-            return (self.get_current_doc(),
+            return (get_current_doc(self.desktop),
                     self.get_app_lib(ctx))
 
         frames = self.desktop.getFrames()
