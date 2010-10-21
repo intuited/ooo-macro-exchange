@@ -216,9 +216,22 @@ def parse_arg(args):
     if len(args) == 4:
         return args[1:]
 
+def main():
+    import argparse
+    parser = argparse.ArgumentParser
+    parser.add_argument('document',
+        help="The name of a document which is open in the running OO.o app.  "
+             "E.G. 'Untitled 1'")
+    parser.add_argument('macro',
+        help="The fully-qualified (Library.Module.Function) name of a macro.  "
+             "E.G. 'Standard.Module1.main'")
+    parser.add_argument('source_file', type=argparse.FileTyle('r'),
+        help="The name of the file which contains the source code.")
+
+    ns = parser.parse_args()
+
+    with ns.source_file as source_file:
+        return Basic().update(ns.document, ns.macro, source_file)
+
 if __name__ == '__main__':
-    document, macro, source_filename = parse_arg(sys.argv)
-    with open(source_filename, 'r') as source_file:
-        Basic().update_and_run(document, macro, source_file)
-    #Basic(ctx).update_and_run('Untitled 1', 'Standard.Module1.main',
-    #    '/home/asuka/Desktop/python/moduleA.bas')
+    exit(main())
