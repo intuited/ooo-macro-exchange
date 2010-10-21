@@ -146,8 +146,11 @@ def resolve_doc_name(context, service_manager, desktop, doc_name,
     return get_doc_lib(desktop, doc_name)
 
 
-script_name_url = (
-    'vnd.sun.star.script:{0}?language=Basic&location=document'.format)
+def script_name_url(script_name):
+    """Returns a URL for a script name like '
+    """
+    fmtstr = 'vnd.sun.star.script:{0}?language=Basic&location=document'
+    return fmtstr.format(script_name)
 
 
 class Basic:
