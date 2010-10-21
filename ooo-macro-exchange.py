@@ -93,7 +93,9 @@ def get_doc_lib(desktop, doc_name):
 
     raise DocLibLookupError(doc_name)
 
-def resolve_doc_name(context, service_manager, desktop, doc_name):
+def resolve_doc_name(context, service_manager, desktop, doc_name,
+                     get_current_doc=get_current_doc, get_app_lib=get_app_lib,
+                     get_doc_lib=get_doc_lib):
     """Returns (doc, libraries).
 
     If ``doc_name`` is "application",
@@ -101,6 +103,8 @@ def resolve_doc_name(context, service_manager, desktop, doc_name):
 
     Raises DocLibLookupError if a document with the specified name
     is not found.
+
+    The various get_* functions can be overridden.
     """
     if doc_name == 'application':
         return (get_current_doc(desktop),
