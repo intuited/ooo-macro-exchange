@@ -172,6 +172,10 @@ class Basic:
         """Pushes the module code for ``macro_name`` from ``source``.
 
         Returns the updated document.
+
+        Example: {doc_name: 'Untitled 1', macro_name: 'Standard.Module1.main',
+                  source: <iterator over lines of
+                           'project/src/basic/some_module.bas'>}
         """
         lib_name, mod_name, procedure = parse_macro_name(macro_name)
         doc, libraries = resolve_doc_name(self.ctx, self.smgr, self.desktop, doc_name)
@@ -197,8 +201,8 @@ def parse_arg(args):
 
 if __name__ == '__main__':
     ctx = get_context()
-    file_name, macro_name, bas_name = parse_arg(sys.argv)
-    with open(file_name, 'r') as source_file:
-        Basic(ctx).update_and_run(source_file, macro_name, bas_name)
+    document, macro, source_filename = parse_arg(sys.argv)
+    with open(source_filename, 'r') as source_file:
+        Basic(ctx).update_and_run(document, macro, source_file)
     #Basic(ctx).update_and_run('Untitled 1', 'Standard.Module1.main',
     #    '/home/asuka/Desktop/python/moduleA.bas')
