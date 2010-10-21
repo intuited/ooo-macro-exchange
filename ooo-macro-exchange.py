@@ -5,8 +5,6 @@ can be invoked from the CLI.
 """
 import sys
 import find_ooo
-sys.path.append(find_ooo.find_ooo())
-import uno
 
 class DocLibLookupError(Exception):
     """Raised if document name lookup fails."""
@@ -25,10 +23,23 @@ class IllegalMacroNameError(Exception):
     pass
 
 
-# http://udk.openoffice.org/common/man
-#       /concept/uno_contexts.html#current_context
-def get_context(uno=uno, host='localhost', port=2002):
-    """Returns a resolved connection context."""
+def get_context(host='localhost', port=2002, find_uno=find_ooo.find_uno):
+    """Returns a resolved connection context.
+
+    `find_uno` is called to acquire an `uno`:module: object.
+    All subsequent calls to the UNO API will go through this object.
+
+    Returns a `component context`, accessed via the `current context`_.
+
+    .. _component context:
+       http://wiki.services.openoffice.org/wiki
+             /Documentation/DevGuide/ProUNO/Component_Context
+    .. _current context:
+       http://udk.openoffice.org
+             /common/man/concept/uno_contexts.html#current_context
+    """
+
+    uno = find_uno()
     localctx = uno.getComponentContext()
     create_instance = localctx.getServiceManager().createInstanceWithContext
 
@@ -36,8 +47,6 @@ def get_context(uno=uno, host='localhost', port=2002):
     resolver = create_instance(resolver_class, localctx)
 
     # http://udk.openoffice.org/common/man/spec/uno-url.html
-    # http://wiki.services.openoffice.org/wiki
-    #       /Documentation/DevGuide/ProUNO/Component_Context
     context_url = ("uno:socket,host={host},port={port};"
                    "urp;StarOffice.ComponentContext".format)
 
@@ -48,6 +57,7 @@ def get_desktop(context, service_manager):
     create_instance = service_manager.createInstanceWithContext
     desktop_class = "com.sun.star.frame.Desktop"
     return create_instance(desktop_class, context)
+
 
 def get_app_lib(context, service_manager):
     # TODO: find out if it's possible for an exception to be thrown
@@ -156,23 +166,24 @@ def script_name_url(script_name):
     return fmtstr.format(script_name)
 
 
-class Basic:
-    """ Update Basic module and excute subroutine. """
-    def __init__(self, ctx):
-        self.ctx = ctx
-        self.smgr = ctx.getServiceManager()
-        self.desktop = get_desktop(self.ctx, self.smgr)
+class Exchange:
+    """Class of the main exchange object.
 
+    Its initialization finds a local OpenOffice installation
+    and attempts to connect to an instance of OOo on the given host/port.
 
-
+    It retains the context, service manager, and desktop acquired
+    from this connection for use by one or more of the exchange methods.
+    """
+    def __init__(self, host='localhost', port='2002', find_uno=find_ooo.find_uno):
+        self.context = get_context(host=host, port=port, find_uno=find_uno)
+        self.smgr = context.getServiceManager()
+        self.desktop = get_desktop(self.context, self.smgr)
 
     def run(self, doc, script_name):
         provider = doc.getScriptProvider()
         script = provider.getScript(script_name_url(script_name))
         return script.invoke((), (), ())
-
-
-
 
     def push(self, doc_name, macro_name, source):
         """Pushes the module code for `macro_name` from `source`.
@@ -184,7 +195,7 @@ class Basic:
                            'project/src/basic/some_module.bas'>}
         """
         lib_name, mod_name, procedure = parse_macro_name(macro_name)
-        doc, libraries = resolve_doc_name(self.ctx, self.smgr, self.desktop, doc_name)
+        doc, libraries = resolve_doc_name(self.context, self.smgr, self.desktop, doc_name)
         lib = get_lib_by_name(libraries, lib_name, 'write')
         update_module(source, lib, mod_name)
         return doc
@@ -206,9 +217,8 @@ def parse_arg(args):
         return args[1:]
 
 if __name__ == '__main__':
-    ctx = get_context()
     document, macro, source_filename = parse_arg(sys.argv)
     with open(source_filename, 'r') as source_file:
-        Basic(ctx).update_and_run(document, macro, source_file)
+        Basic().update_and_run(document, macro, source_file)
     #Basic(ctx).update_and_run('Untitled 1', 'Standard.Module1.main',
     #    '/home/asuka/Desktop/python/moduleA.bas')
