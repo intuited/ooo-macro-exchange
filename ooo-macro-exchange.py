@@ -1,5 +1,8 @@
-# -*- encoding: utf-8 -*-
+"""Library to facilitate moving code between files and open OpenOffice docs.
 
+The main functions -- `push`, `pull`, `run` --
+can be invoked from the CLI.
+"""
 import sys
 import find_ooo
 sys.path.append(find_ooo.find_ooo())
@@ -58,12 +61,12 @@ def get_current_doc(desktop):
     return desktop.getCurrentComponent()
 
 def get_lib_by_name(libs, library_name, mode='read'):
-    """Get the library named by ``library_name``.
+    """Get the library named by `library_name`.
 
-    ``libraries`` is a sequence of libraries,
-    as returned by ``get_doc_lib``.
+    `libraries` is a sequence of libraries,
+    as returned by `get_doc_lib`.
 
-    If ``mode`` is 'write',
+    If `mode` is 'write',
     the library is checked for write access.
     """
     if not libs.hasByName(lib_name):
@@ -84,7 +87,7 @@ def get_lib_by_name(libs, library_name, mode='read'):
 
 
 def get_doc_lib(desktop, doc_name):
-    """Returns (document, library) for ``doc_name``."""
+    """Returns (document, library) for `doc_name`."""
     frames = desktop.getFrames()
     for i in range(frames.getCount()):
         controller = frames.getByIndex(i).getController()
@@ -96,9 +99,9 @@ def get_doc_lib(desktop, doc_name):
 
 
 def update_module(lines, lib, mod_name):
-    """Update the named module in the given library with ``lines``.
+    """Update the named module in the given library with `lines`.
 
-    ``lines`` should be an iterator over strings.
+    `lines` should be an iterator over strings.
     """
     contents = ''.join(lines)
 
@@ -132,7 +135,7 @@ def resolve_doc_name(context, service_manager, desktop, doc_name,
                      get_doc_lib=get_doc_lib):
     """Returns (doc, libraries).
 
-    If ``doc_name`` is "application",
+    If `doc_name` is "application",
     returns the current document and the app library.
 
     Raises DocLibLookupError if a document with the specified name
@@ -172,7 +175,7 @@ class Basic:
 
 
     def push(self, doc_name, macro_name, source):
-        """Pushes the module code for ``macro_name`` from ``source``.
+        """Pushes the module code for `macro_name` from `source`.
 
         Returns the updated document.
 
@@ -187,7 +190,7 @@ class Basic:
         return doc
 
     def update_and_run(self, doc_name, macro_name, source):
-        """ Update module from filename and run ``macro_name`` in ``doc_name``.
+        """ Update module from filename and run `macro_name` in `doc_name`.
 
             If doc_name is 'application',
             the macro is updated in the application library
