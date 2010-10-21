@@ -19,6 +19,7 @@ class PasswordProtectionError(Exception):
 
 class IllegalMacroNameError(Exception):
     """Raised if a macro name with less or more than three parts is given."""
+    pass
 
 
 # http://udk.openoffice.org/common/man
