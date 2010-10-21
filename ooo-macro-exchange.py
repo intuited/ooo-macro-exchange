@@ -93,6 +93,27 @@ def get_doc_lib(desktop, doc_name):
 
     raise DocLibLookupError(doc_name)
 
+
+def update_module(lines, libs, lib_name, mod_name):
+    """Update the named module in the named library."""
+    lib = get_lib_by_name(libs, lib_name, 'write')
+
+    contents = ''.join(lines)
+
+    if not lib.hasByName(mod_name):
+        lib.insertByName(mod_name, contents)
+    else:
+        lib.replaceByName(mod_name, contents)
+
+
+def parse_macro_name(name):
+    """Splits a macro name into its requisite 3 components."""
+    parts = name.split('.')
+    if len(parts) != 3:
+        raise IllegalMacroNameError(name)
+    return parts
+
+
 def resolve_doc_name(context, service_manager, desktop, doc_name,
                      get_current_doc=get_current_doc, get_app_lib=get_app_lib,
                      get_doc_lib=get_doc_lib):
@@ -124,17 +145,6 @@ class Basic:
         self.desktop = get_desktop(self.ctx, self.smgr)
 
 
-    def update_module(self, lines, libs, lib_name, mod_name):
-        """Update the named module in the named library."""
-        lib = get_lib_by_name(libs, lib_name, 'write')
-
-        contents = ''.join(lines)
-
-        if not lib.hasByName(mod_name):
-            lib.insertByName(mod_name, contents)
-        else:
-            lib.replaceByName(mod_name, contents)
-
 
 
     def run(self, doc, script_name):
@@ -144,22 +154,15 @@ class Basic:
 
 
 
-    def parse_name(self, name):
-        """Parse macro name."""
-        parts = name.split('.')
-        if len(parts) != 3:
-            raise IllegalMacroNameError(name)
-        return parts
-
 
     def push(self, doc_name, macro_name, source):
         """Pushes the module code for ``macro_name`` from ``source``.
 
         Returns the updated document.
         """
-        lib_name, mod_name, procedure = self.parse_name(macro_name)
+        lib_name, mod_name, procedure = parse_macro_name(macro_name)
         doc, libraries = resolve_doc_name(self.ctx, self.smgr, self.desktop, doc_name)
-        self.update_module(source, libraries, lib_name, mod_name)
+        update_module(source, libraries, lib_name, mod_name)
         return doc
 
     def update_and_run(self, doc_name, macro_name, source):
