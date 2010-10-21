@@ -95,10 +95,11 @@ def get_doc_lib(desktop, doc_name):
     raise DocLibLookupError(doc_name)
 
 
-def update_module(lines, libs, lib_name, mod_name):
-    """Update the named module in the named library."""
-    lib = get_lib_by_name(libs, lib_name, 'write')
+def update_module(lines, lib, mod_name):
+    """Update the named module in the given library with ``lines``.
 
+    ``lines`` should be an iterator over strings.
+    """
     contents = ''.join(lines)
 
     if not lib.hasByName(mod_name):
@@ -174,7 +175,8 @@ class Basic:
         """
         lib_name, mod_name, procedure = parse_macro_name(macro_name)
         doc, libraries = resolve_doc_name(self.ctx, self.smgr, self.desktop, doc_name)
-        update_module(source, libraries, lib_name, mod_name)
+        lib = get_lib_by_name(libraries, lib_name, 'write')
+        update_module(source, lib, mod_name)
         return doc
 
     def update_and_run(self, doc_name, macro_name, source):
