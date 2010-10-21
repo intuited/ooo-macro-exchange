@@ -114,6 +114,13 @@ def parse_macro_name(name):
     return parts
 
 
+# Not sure if there's any point in parametrizing these functions.
+# The idea is to allow their results to be memoized in some manner,
+# perhaps by virtue of being properties of an object.
+# I'm mildly concerned that they could return inconsistent results
+# if the OOo app changes document while this macro is running.
+# Memoizing would allow consistent results to be returned
+# over the scope of a "transaction".
 def resolve_doc_name(context, service_manager, desktop, doc_name,
                      get_current_doc=get_current_doc, get_app_lib=get_app_lib,
                      get_doc_lib=get_doc_lib):
