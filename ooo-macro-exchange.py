@@ -107,7 +107,11 @@ def update_module(lines, libs, lib_name, mod_name):
 
 
 def parse_macro_name(name):
-    """Splits a macro name into its requisite 3 components."""
+    """Splits a macro name into its requisite 3 components.
+
+    The components are (library, module, function).
+    For example: 'Standard.Module1.main'.
+    """
     parts = name.split('.')
     if len(parts) != 3:
         raise IllegalMacroNameError(name)
