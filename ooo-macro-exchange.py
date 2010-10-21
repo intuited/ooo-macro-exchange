@@ -21,6 +21,8 @@ class IllegalMacroNameError(Exception):
     """Raised if a macro name with less or more than three parts is given."""
 
 
+# http://udk.openoffice.org/common/man
+#       /concept/uno_contexts.html#current_context
 def get_context(uno=uno, host='localhost', port=2002):
     """Returns a resolved connection context."""
     localctx = uno.getComponentContext()
@@ -29,6 +31,9 @@ def get_context(uno=uno, host='localhost', port=2002):
     resolver_class = "com.sun.star.bridge.UnoUrlResolver"
     resolver = create_instance(resolver_class, localctx)
 
+    # http://udk.openoffice.org/common/man/spec/uno-url.html
+    # http://wiki.services.openoffice.org/wiki
+    #       /Documentation/DevGuide/ProUNO/Component_Context
     context_url = ("uno:socket,host={host},port={port};"
                    "urp;StarOffice.ComponentContext".format)
 
