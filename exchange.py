@@ -17,7 +17,8 @@ class Exchange:
     It retains the context, service manager, and desktop acquired
     from this connection for use by one or more of the exchange methods.
     """
-    def __init__(self, host='localhost', port='2002', find_uno=find_ooo.find_uno):
+    def __init__(self, host='localhost', port='2002',
+                       find_uno=find_ooo.find_uno):
         self.context = connect.get_context(host=host, port=port,
                                            find_uno=find_uno)
         self.smgr = self.context.getServiceManager()
