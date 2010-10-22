@@ -27,6 +27,9 @@ def parse_args():
     import argparse
 
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--host', default='localhost')
+    parser.add_argument('-p', '--port', default='2002')
+
     commands = parser.add_subparsers(dest='command')
 
     push_command = commands.add_parser(
@@ -55,7 +58,8 @@ def take_action(options):
     """
     from exchange import Exchange
 
-    action = getattr(Exchange(), options.command)
+    action = getattr(Exchange(host=options.host, port=options.port),
+                     options.command)
 
     arg_attrs = ['document', 'macro']
 
