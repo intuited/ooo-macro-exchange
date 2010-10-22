@@ -8,10 +8,10 @@ def parse_arg(args):
 
 add_document_arg = methodcaller('add_argument', 'document',
     help="The name of a document which is open in the running OO.o app.  "
-            "E.G. 'Untitled 1'")
+         "E.G. 'Untitled 1'")
 add_macro_arg = methodcaller('add_argument', 'macro',
     help="The name of the macro library or routine.  "
-            "E.G. 'Standard.Module1.main'")
+         "E.G. 'Standard.Module1.main'")
 def add_source_file_arg(parser, mode='read'):
     from sys import stdin, stdout
     from argparse import FileType
