@@ -108,17 +108,29 @@ def get_doc_lib(desktop, doc_name):
     raise DocLibLookupError(doc_name)
 
 
+def get_module_source(lib, module_name):
+    """Return a list of the source lines for the module `module_name` in `lib`.
+
+    Lines do not have terminating newlines.
+    """
+    return lib.getByName(module_name).split("\n")
+
 def update_module(lines, lib, mod_name):
     """Update the named module in the given library with `lines`.
 
     `lines` should be an iterator over strings.
     """
-    contents = ''.join(lines)
+    contents = '\n'.join(line.rstrip("\n") for line in iter(lines))
 
     if not lib.hasByName(mod_name):
         lib.insertByName(mod_name, contents)
     else:
         lib.replaceByName(mod_name, contents)
+
+def invoke_macro(doc, script_name):
+    provider = doc.getScriptProvider()
+    script = provider.getScript(script_name_url(script_name))
+    return script.invoke((), (), ())
 
 
 def parse_macro_name(name):
@@ -180,25 +192,44 @@ class Exchange:
         self.smgr = self.context.getServiceManager()
         self.desktop = get_desktop(self.context, self.smgr)
 
-    def run(self, doc, script_name):
-        provider = doc.getScriptProvider()
-        script = provider.getScript(script_name_url(script_name))
-        return script.invoke((), (), ())
+    def invoke(self, doc_name, macro_name):
+        doc, libraries = resolve_doc_name(self.context, self.smgr, self.desktop, doc_name)
+        invoke_macro(doc, macro_name)
 
     def push(self, doc_name, macro_name, source):
         """Pushes the module code for `macro_name` from `source`.
 
         Returns the updated document.
 
-        Example: {doc_name: 'Untitled 1', macro_name: 'Standard.Module1.main',
-                  source: <iterator over lines of
-                           'project/src/basic/some_module.bas'>}
+        >>> Exchange().push({doc_name: 'Untitled 1',
+        ...                  macro_name: 'Standard.Fraggle.main',
+        ...                  source: open('project/src/basic/fraggle.bas')})
+        ... # doctest: +SKIP
         """
+        # TODO: sort out the fact that the routine name is irrelevant here.
+        #       The fact that it's required by parse_macro_name is vestigial.
+        #       This routine should take the library and module names
+        #       instead of the unparsed macro_name;
+        #       parsing should happen at the command line layer.
         lib_name, mod_name, procedure = parse_macro_name(macro_name)
         doc, libraries = resolve_doc_name(self.context, self.smgr, self.desktop, doc_name)
         lib = get_lib_by_name(libraries, lib_name, 'write')
         update_module(source, lib, mod_name)
         return doc
+
+    def pull(self, doc_name, macro_name):
+        """Gets the module code for `macro_name` from `source`.
+
+        Yields the lines of source.
+
+        Example::
+            {doc_name: 'Untitled 1', macro_name: 'Standard.Module1.main'}
+        """
+        # TODO: see TODO for `Exchange.push`.
+        lib_name, mod_name, procedure = parse_macro_name(macro_name)
+        doc, libraries = resolve_doc_name(self.context, self.smgr, self.desktop, doc_name)
+        lib = get_lib_by_name(libraries, lib_name, 'read')
+        return get_module_source(lib, mod_name)
 
     def update_and_run(self, doc_name, macro_name, source):
         """ Update module from filename and run `macro_name` in `doc_name`.
@@ -210,28 +241,3 @@ class Exchange:
         """
         doc = self.push(doc_name, macro_name, source)
         self.run(doc, macro_name)
-
-
-def parse_arg(args):
-    if len(args) == 4:
-        return args[1:]
-
-def main():
-    import argparse
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('document',
-        help="The name of a document which is open in the running OO.o app.  "
-             "E.G. 'Untitled 1'")
-    parser.add_argument('macro',
-        help="The fully-qualified (Library.Module.Function) name of a macro.  "
-             "E.G. 'Standard.Module1.main'")
-    parser.add_argument('source_file', type=argparse.FileType('r'),
-        help="The name of the file which contains the source code.")
-
-    ns = parser.parse_args()
-
-    with ns.source_file as source_file:
-        return Exchange().push(ns.document, ns.macro, source_file)
-
-if __name__ == '__main__':
-    exit(main())
