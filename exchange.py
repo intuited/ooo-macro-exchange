@@ -64,14 +64,3 @@ class Exchange:
                                              self.desktop, doc_name)
         lib = libraries.get_lib_by_name(libs, lib_name, 'read')
         return library.get_module_source(lib, mod_name)
-
-    def update_and_run(self, doc_name, macro_name, source):
-        """ Update module from filename and run `macro_name` in `doc_name`.
-
-            If doc_name is 'application',
-            the macro is updated in the application library
-            and executed on the active document.
-            Otherwise, it is stored in the document and invoked on that document.
-        """
-        doc = self.push(doc_name, macro_name, source)
-        self.run(doc, macro_name)
