@@ -79,21 +79,21 @@ def get_lib_by_name(libs, library_name, mode='read'):
     If `mode` is 'write',
     the library is checked for write access.
     """
-    if not libs.hasByName(lib_name):
-        libs.createLibrary(lib_name)
+    if not libs.hasByName(library_name):
+        libs.createLibrary(library_name)
 
     if mode == 'write':
-        if libs.isLibraryReadOnly(lib_name):
-            raise ReadonlyLibraryError(lib_name)
+        if libs.isLibraryReadOnly(library_name):
+            raise ReadonlyLibraryError(library_name)
 
-    if (libs.isLibraryPasswordProtected(lib_name)
-        and not libs.isLibraryPasswordVerified(lib_name):
-        raise PasswordProtectionError(lib_name)
+    if (libs.isLibraryPasswordProtected(library_name)
+        and not libs.isLibraryPasswordVerified(library_name)):
+        raise PasswordProtectionError(library_name)
 
-    if not libs.isLibraryLoaded(lib_name):
-        libs.loadLibrary(lib_name)
+    if not libs.isLibraryLoaded(library_name):
+        libs.loadLibrary(library_name)
 
-    return libs.getByName(lib_name)
+    return libs.getByName(library_name)
 
 
 def get_doc_lib(desktop, doc_name):
@@ -177,7 +177,7 @@ class Exchange:
     """
     def __init__(self, host='localhost', port='2002', find_uno=find_ooo.find_uno):
         self.context = get_context(host=host, port=port, find_uno=find_uno)
-        self.smgr = context.getServiceManager()
+        self.smgr = self.context.getServiceManager()
         self.desktop = get_desktop(self.context, self.smgr)
 
     def run(self, doc, script_name):
@@ -218,20 +218,20 @@ def parse_arg(args):
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('document',
         help="The name of a document which is open in the running OO.o app.  "
              "E.G. 'Untitled 1'")
     parser.add_argument('macro',
         help="The fully-qualified (Library.Module.Function) name of a macro.  "
              "E.G. 'Standard.Module1.main'")
-    parser.add_argument('source_file', type=argparse.FileTyle('r'),
+    parser.add_argument('source_file', type=argparse.FileType('r'),
         help="The name of the file which contains the source code.")
 
     ns = parser.parse_args()
 
     with ns.source_file as source_file:
-        return Basic().update(ns.document, ns.macro, source_file)
+        return Exchange().push(ns.document, ns.macro, source_file)
 
 if __name__ == '__main__':
     exit(main())

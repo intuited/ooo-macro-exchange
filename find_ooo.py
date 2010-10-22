@@ -6,6 +6,7 @@ def find_ooo():
     return "/usr/lib/openoffice/basis3.2/program/"
 
 def find_uno():
+    import sys
     sys.path.insert(0, find_ooo())
     import uno
     return uno
