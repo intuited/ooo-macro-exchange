@@ -30,6 +30,22 @@ or by fetching and installing the source code from the `github repo`_.
 .. _github repo: http://github.com/intuited/ooo-macro-exchange
 
 
+Environment
+-----------
+
+If the ``uno`` Python module cannot be imported,
+ooo-macro-exchange will try to add it to the path.
+
+If the environment variable ``PY_UNO_PATH`` is defined,
+``ooo-macro-exchange`` will add it to the python path.
+
+This can also be accomplished by setting ``PYTHONPATH``.
+
+If ``PY_UNO_PATH`` is unset,
+``ooo-macro-exchange`` will try the path
+``/usr/lib/openoffice/basis3.2/program/``.
+
+
 Usage
 -----
 
