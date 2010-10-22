@@ -9,6 +9,27 @@ It does not appear to be possible to use such a system to access Python macros
 in an OpenOffice document.  This module only deals with Basic macros.
 
 
+Dependencies
+------------
+
+You will need to have the py-uno bridge set up.
+
+On Debian-ish systems like Ubuntu and Linux Mint,
+this can generally be installed via ::
+
+    $ sudo aptitude install python-uno
+
+
+Installation
+------------
+
+Installation can be done via `PyPI`,
+or by fetching and installing the source code from the `github repo`_.
+
+.. _PyPI: http://pypi.python.org/ooo-macro-exchange
+.. _github repo: http://github.com/intuited/ooo-macro-exchange
+
+
 Usage
 -----
 
