@@ -74,7 +74,7 @@ def get_lib_by_name(libs, library_name, mode='read'):
     """Get the library named by `library_name`.
 
     `libraries` is a sequence of libraries,
-    as returned by `get_doc_lib`.
+    as returned by `get_libraries`.
 
     If `mode` is 'write',
     the library is checked for write access.
@@ -96,16 +96,19 @@ def get_lib_by_name(libs, library_name, mode='read'):
     return libs.getByName(library_name)
 
 
-def get_doc_lib(desktop, doc_name):
-    """Returns (document, library) for `doc_name`."""
+def get_document(desktop, doc_name):
+    """Returns the document corresponding to `doc_name`."""
     frames = desktop.getFrames()
     for i in range(frames.getCount()):
         controller = frames.getByIndex(i).getController()
         if controller and controller.getTitle() == doc_name:
-            doc = controller.getModel()
-            return doc, doc.BasicLibraries
+            return controller.getModel()
 
     raise DocLibLookupError(doc_name)
+
+def get_libraries(document):
+    """Returns the libraries for the `document`."""
+    return document.BasicLibraries
 
 
 def get_module_source(lib, module_name):
@@ -154,7 +157,7 @@ def parse_macro_name(name):
 # over the scope of a "transaction".
 def resolve_doc_name(context, service_manager, desktop, doc_name,
                      get_current_doc=get_current_doc, get_app_lib=get_app_lib,
-                     get_doc_lib=get_doc_lib):
+                     get_document=get_document):
     """Returns (doc, libraries).
 
     If `doc_name` is "application",
@@ -168,7 +171,8 @@ def resolve_doc_name(context, service_manager, desktop, doc_name,
     if doc_name == 'application':
         return (get_current_doc(desktop),
                 get_app_lib(context, service_manager))
-    return get_doc_lib(desktop, doc_name)
+    doc = get_document(desktop, doc_name)
+    return doc, get_libraries(doc)
 
 
 def script_name_url(script_name):
