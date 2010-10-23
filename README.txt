@@ -1,5 +1,5 @@
-`ooo-macro-exchange`
-====================
+``ooo-macro-exchange``
+======================
 
 Routines and CLI to facilitate injection/extraction of OpenOffice.org macros.
 
@@ -23,7 +23,7 @@ this can generally be installed via ::
 Installation
 ------------
 
-Installation can be done via `PyPI`,
+Installation can be done via `PyPI`_,
 or by fetching and installing the source code from the `github repo`_.
 
 .. _PyPI: http://pypi.python.org/ooo-macro-exchange
@@ -32,6 +32,9 @@ or by fetching and installing the source code from the `github repo`_.
 
 Environment
 -----------
+
+The ``uno`` Python module will normally be imported without problems
+on systems which have the ``python-uno`` module properly installed.
 
 If the ``uno`` Python module cannot be imported,
 ``ooo-macro-exchange`` will try to add it to the path.
