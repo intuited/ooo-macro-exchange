@@ -56,10 +56,11 @@ setup(
     keywords = split_keywords("""
         ooo openoffice openoffice.org macro basic starbasic oobasic uno
         """),
-    packages = ['ooo-macro-exchange'],
+    packages = ['oomax'],
+    package_dir = {'oomax': ''},
     entry_points = {
         'console_scripts': [
-            'ooo-macro-exchange = ooo-macro-exchange.__main__:main',
+            'oomax = oomax.__main__:main',
             ]
         },
     )

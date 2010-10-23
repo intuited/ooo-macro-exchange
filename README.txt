@@ -34,7 +34,7 @@ Environment
 -----------
 
 If the ``uno`` Python module cannot be imported,
-ooo-macro-exchange will try to add it to the path.
+``ooo-macro-exchange`` will try to add it to the path.
 
 If the environment variable ``PY_UNO_PATH`` is defined,
 ``ooo-macro-exchange`` will add it to the python path.
@@ -55,8 +55,12 @@ Basic functions are
 -   ``push``: replace a module's code with lines from a file or stdin
 -   ``invoke``: run a macro.
 
-Options etc. can be discovered by running ``python __main__ -h``,
-or by installing and running ``ooo-macro-exchange -h``.
+The ``oomax`` script provides command-line access to these actions.
+
+Options etc. can be discovered by running ``oomax -h``.
+
+These actions are also available as methods
+of the class `oomax.Exchange`.
 
 
 Relationship to other modules
@@ -64,7 +68,6 @@ Relationship to other modules
 
 The structure of the code is pretty similar
 to that used by `openoffice-python`_.
-
 There are vague plans to integrate this module's functionality with it.
 
 The code in this module was originally derived from this `forum post`_.
