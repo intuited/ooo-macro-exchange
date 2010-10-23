@@ -32,7 +32,7 @@ def file_contents(filename):
 
 setup(
     name = "ooo-macro-exchange",
-    version = "0.2",
+    version = "0.2.1",
     author = "Ted Tibbetts",
     author_email = "intuited@gmail.com",
     url = "http://github.com/intuited/ooo-macro-exchange",

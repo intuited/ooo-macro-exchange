@@ -71,7 +71,7 @@ The ``oomax`` script provides command-line access to these actions.  E.G.::
 
 Options etc. can be discovered by running ``oomax -h``.
 
-These actions are also available as methods
+`pull`, `push`, and `invoke` are also available as methods
 of the class `oomax.Exchange`.
 
 
