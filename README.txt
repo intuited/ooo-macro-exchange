@@ -71,3 +71,12 @@ The code in this module was originally derived from this `forum post`_.
 
 .. _openoffice-python: http://pypi.python.org/pypi/openoffice-python/
 .. _forum post: http://www.oooforum.org/forum/viewtopic.phtml?t=94349#356461
+
+
+License
+-------
+
+``ooo-macro-exchange`` is licensed under the `FreeBSD License`_.
+See the file COPYING for details.
+
+.. _FreeBSD License: http://www.freebsd.org/copyright/freebsd-license.html
