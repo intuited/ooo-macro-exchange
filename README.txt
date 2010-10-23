@@ -55,7 +55,16 @@ Basic functions are
 -   ``push``: replace a module's code with lines from a file or stdin
 -   ``invoke``: run a macro.
 
-The ``oomax`` script provides command-line access to these actions.
+The ``oomax`` script provides command-line access to these actions.  E.G.::
+
+    $ oomax pull 'Document 1' Standard.Module1.main
+    sub main
+        ' Content of main macro
+    end sub
+
+    sub another
+        ' Content of some other macro
+    end sub
 
 Options etc. can be discovered by running ``oomax -h``.
 
