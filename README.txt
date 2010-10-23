@@ -57,12 +57,12 @@ Basic functions are
 
 The ``oomax`` script provides command-line access to these actions.  E.G.::
 
-    $ oomax pull 'Document 1' Standard.Module1.main
-    sub main
+    $ oomax pull 'Document 1' Standard.Module1
+    sub Main()
         ' Content of main macro
     end sub
 
-    sub another
+    sub AnotherMacro()
         ' Content of some other macro
     end sub
 

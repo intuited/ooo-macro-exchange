@@ -5,18 +5,6 @@ class IllegalMacroNameError(Exception):
     pass
 
 
-def parse_macro_name(name):
-    """Splits a macro name into its requisite 3 components.
-
-    The components are (library, module, function).
-    For example: 'Standard.Module1.main'.
-    """
-    parts = name.split('.')
-    if len(parts) != 3:
-        raise IllegalMacroNameError(name)
-    return parts
-
-
 def get_module_source(lib, module_name):
     """Return a list of the source lines for the module `module_name` in `lib`.
 

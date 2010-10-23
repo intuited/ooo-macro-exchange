@@ -25,17 +25,22 @@ class Exchange:
         self.desktop = context.get_desktop(self.context, self.smgr)
 
     def invoke(self, doc_name, macro_name):
+        """Invoke the macro in the running OOo instance.
+
+        `macro_name` should be a fully-qualified macro name,
+        for example 'Standard.Module1.main'.
+        """
         doc, libs = context.resolve_doc_name(self.context, self.smgr,
                                              self.desktop, doc_name)
         document.invoke_macro(doc, macro_name)
 
-    def push(self, doc_name, macro_name, source):
+    def push(self, doc_name, library_name, module_name, source):
         """Pushes the module code for `macro_name` from `source`.
 
         Returns the updated document.
 
         >>> Exchange().push(doc_name='Untitled 1',
-        ...                 macro_name='Standard.Fraggle.main',
+        ...                 library_name='Standard', module_name='Fraggle',
         ...                 source=open('project/src/basic/fraggle.bas'))
         ... # doctest: +SKIP
         """
@@ -44,24 +49,27 @@ class Exchange:
         #       This routine should take the library and module names
         #       instead of the unparsed macro_name;
         #       parsing should happen at the command line layer.
-        lib_name, mod_name, procedure = library.parse_macro_name(macro_name)
         doc, libs = context.resolve_doc_name(self.context, self.smgr,
                                              self.desktop, doc_name)
-        lib = libraries.get_lib_by_name(libs, lib_name, 'write')
-        library.update_module(source, lib, mod_name)
+        lib = libraries.get_lib_by_name(libs, library_name, 'write')
+        library.update_module(source, lib, module_name)
         return doc
 
-    def pull(self, doc_name, macro_name):
+    def pull(self, doc_name, library_name, module_name):
         """Gets the module code for `macro_name` from `source`.
 
         Yields the lines of source.
 
-        Example::
-            {doc_name: 'Untitled 1', macro_name: 'Standard.Module1.main'}
+        >>> Exchange().pull(doc_name: 'Untitled 1',
+        ...                 library_name: 'Standard',
+        ...                 module_name: 'Module1')
+        ... # doctest: +SKIP
+        ['sub main',
+         '    MsgBox("This is the main macro in Standard.Module1.")',
+         'end sub']
         """
         # TODO: see TODO for `Exchange.push`.
-        lib_name, mod_name, procedure = library.parse_macro_name(macro_name)
         doc, libs = context.resolve_doc_name(self.context, self.smgr,
                                              self.desktop, doc_name)
-        lib = libraries.get_lib_by_name(libs, lib_name, 'read')
-        return library.get_module_source(lib, mod_name)
+        lib = libraries.get_lib_by_name(libs, library_name, 'read')
+        return library.get_module_source(lib, module_name)
