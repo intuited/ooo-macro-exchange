@@ -34,9 +34,9 @@ class Exchange:
 
         Returns the updated document.
 
-        >>> Exchange().push({doc_name: 'Untitled 1',
-        ...                  macro_name: 'Standard.Fraggle.main',
-        ...                  source: open('project/src/basic/fraggle.bas')})
+        >>> Exchange().push(doc_name='Untitled 1',
+        ...                 macro_name='Standard.Fraggle.main',
+        ...                 source=open('project/src/basic/fraggle.bas'))
         ... # doctest: +SKIP
         """
         # TODO: sort out the fact that the routine name is irrelevant here.
