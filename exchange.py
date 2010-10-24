@@ -44,11 +44,6 @@ class Exchange:
         ...                 source=open('project/src/basic/fraggle.bas'))
         ... # doctest: +SKIP
         """
-        # TODO: sort out the fact that the routine name is irrelevant here.
-        #       The fact that it's required by parse_macro_name is vestigial.
-        #       This routine should take the library and module names
-        #       instead of the unparsed macro_name;
-        #       parsing should happen at the command line layer.
         doc, libs = context.resolve_doc_name(self.context, self.smgr,
                                              self.desktop, doc_name)
         lib = libraries.get_lib_by_name(libs, library_name, 'write')
