@@ -54,6 +54,8 @@ def ArgumentParser():
 
     push_command = commands.add_parser(
         'push', help="Push code into the given module.")
+    push_command.add_argument('-s', '--save', action='store_true',
+        help="Save the document after updating the macro module.")
     add_document_arg(push_command)
     add_macro_arg(push_command)
     add_source_file_arg(push_command, 'read')
@@ -108,11 +110,13 @@ def take_action(options):
 
     args = [options.document] + split_macro_name(options.command,
                                                  options.macro)
+    kwargs = {}
 
     if options.command == 'push':
         args.append(options.source_file)
+        kwargs.update(save=options.save)
 
-    result = action(*args)
+    result = action(*args, **kwargs)
 
     if options.command == 'pull':
         options.source_file.writelines(line + "\n" for line in result)

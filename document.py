@@ -15,3 +15,7 @@ def invoke_macro(doc, script_name):
     provider = doc.getScriptProvider()
     script = provider.getScript(script_name_url(script_name))
     return script.invoke((), (), ())
+
+def save(doc):
+    """Save the document to its location."""
+    doc.store()

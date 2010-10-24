@@ -34,8 +34,10 @@ class Exchange:
                                              self.desktop, doc_name)
         document.invoke_macro(doc, macro_name)
 
-    def push(self, doc_name, library_name, module_name, source):
+    def push(self, doc_name, library_name, module_name, source, save=False):
         """Pushes the module code for `macro_name` from `source`.
+
+        If `save` is truthy, the updated document will be saved to disk.
 
         Returns the updated document.
 
@@ -48,6 +50,8 @@ class Exchange:
                                              self.desktop, doc_name)
         lib = libraries.get_lib_by_name(libs, library_name, 'write')
         library.update_module(source, lib, module_name)
+        if save:
+            document.save(doc)
         return doc
 
     def pull(self, doc_name, library_name, module_name):
