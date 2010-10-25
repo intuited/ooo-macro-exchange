@@ -8,6 +8,10 @@ Works by connecting to a live instance of OOo.
 It does not appear to be possible to use such a system to access Python macros
 in an OpenOffice document.  This module only deals with Basic macros.
 
+There has also been some effort made to "Pythonify" the uno interface,
+for example, by adding sequence and mapping proxy classes
+for some of the uno container interfaces.
+
 
 Dependencies
 ------------
@@ -69,7 +73,12 @@ The ``oomax`` script provides command-line access to these actions.  E.G.::
         ' Content of some other macro
     end sub
 
-Options etc. can be discovered by running ``oomax -h``.
+Note that ``oomax push`` will not save the document
+unless the ``-s`` option is passed.
+Instead, it will mark both the document and its libraries as modified.
+This will cause the "Save" icon on the main document toolbar to activate.
+
+Additional options can be discovered by running ``oomax -h``.
 
 `pull`, `push`, and `invoke` are also available as methods
 of the class `oomax.Exchange`.
