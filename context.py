@@ -1,6 +1,6 @@
 """Functions to get data or objects from a context."""
 
-import desktop, document
+import desktop, document, libraries
 
 def get_desktop(context, service_manager):
     create_instance = service_manager.createInstanceWithContext
@@ -43,4 +43,5 @@ def resolve_doc_name(context, service_manager, desktop, doc_name,
         return (get_current_doc(desktop),
                 get_application_libraries(context, service_manager))
     doc = get_document(desktop, doc_name)
-    return doc, get_libraries(doc)
+    libs = libraries.Libraries(get_libraries(doc))
+    return doc, libs

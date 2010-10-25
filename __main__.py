@@ -3,7 +3,9 @@ from contextlib import contextmanager
 from operator import methodcaller
 from functools import partial
 
-from library import IllegalMacroNameError
+class IllegalMacroNameError(Exception):
+    """Raised if a macro name with less or more than three parts is given."""
+    pass
 
 
 # Parse
@@ -119,7 +121,7 @@ def take_action(options):
     result = action(*args, **kwargs)
 
     if options.command == 'pull':
-        options.source_file.writelines(line + "\n" for line in result)
+        options.source_file.writelines(line.rstrip('\n') + "\n" for line in result)
 
 
 # Main

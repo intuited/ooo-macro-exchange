@@ -1,25 +1,20 @@
 """Routines to update and access macros in libraries."""
+from collections import Mapping
 
-class IllegalMacroNameError(Exception):
-    """Raised if a macro name with less or more than three parts is given."""
+from container import name_access, name_container
+
+class ReadonlyLibraryError(Exception):
+    """Raised if an attempt is made to update a readonly library."""
     pass
 
 
-def get_module_source(lib, module_name):
-    """Return a list of the source lines for the module `module_name` in `lib`.
+class WriteableLibrary(name_container):
+    pass
 
-    Lines do not have terminating newlines.
-    """
-    return lib.getByName(module_name).split("\n")
-
-def update_module(lines, lib, mod_name):
-    """Update the named module in the given library with `lines`.
-
-    `lines` should be an iterator over strings.
-    """
-    contents = '\n'.join(line.rstrip("\n") for line in iter(lines))
-
-    if not lib.hasByName(mod_name):
-        lib.insertByName(mod_name, contents)
-    else:
-        lib.replaceByName(mod_name, contents)
+class ReadOnlyLibrary(WriteableLibrary):
+    def __setitem__(self, name, value):
+        raise ReadonlyLibraryError(
+            "Tried to set module '{0}' on a read-only library.".format(name))
+    def __delitem__(self, name):
+        raise ReadonlyLibraryError(
+            "Tried to remove module '{0}' of a read-only library.".format(name))

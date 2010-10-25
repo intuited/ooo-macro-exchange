@@ -1,4 +1,5 @@
-from collections import Sequence, Mapping
+from collections import Sequence, Mapping, MutableMapping
+
 class index_access(Sequence):
     """Useful for wrapping uno sequences which implement `XIndexAccess`_.
 
@@ -40,9 +41,31 @@ class name_access(Mapping):
     def __contains__(self, name):
         return self._proxied.hasByName(name)
     def __getitem__(self, name):
+        if not isinstance(name, basestring):
+            raise TypeError("Key '{0}' not a string.".format(name))
         if self._proxied.hasByName(name):
             return self._proxied.getByName(name)
         else:
             raise KeyError("'{0}' not in XNameAccess object.".format(name))
     def __getattr__(self, name):
         return getattr(self._proxied, name)
+
+class name_container(name_access, MutableMapping):
+    """Proxies `XNameContainer`_ implementors with Pythonic dict-ness.
+
+    .. _XNameContainer:
+       http://api.openoffice.org
+             /docs/common/ref/com/sun/star/container
+             /XNameContainer.html#insertByName
+    """
+    def __setitem__(self, name, value):
+        if not isinstance(name, basestring):
+            raise TypeError("Key '{0}' not a string.".format(name))
+        if self._proxied.hasByName(name):
+            self._proxied.replaceByName(name, value)
+        else:
+            self._proxied.insertByName(name, value)
+    def __delitem__(self, name):
+        if not isinstance(name, basestring):
+            raise TypeError("Key '{0}' not a string.".format(name))
+        self._proxied.removeByName(name)

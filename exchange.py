@@ -37,6 +37,8 @@ class Exchange:
     def push(self, doc_name, library_name, module_name, source, save=False):
         """Pushes the module code for `macro_name` from `source`.
 
+        If the library does not exist, it is created.
+
         If `save` is truthy, the updated document will be saved to disk.
 
         Returns the updated document.
@@ -46,12 +48,26 @@ class Exchange:
         ...                 source=open('project/src/basic/fraggle.bas'))
         ... # doctest: +SKIP
         """
+        # TODO: There should probably be some exception-handling in here.
         doc, libs = context.resolve_doc_name(self.context, self.smgr,
                                              self.desktop, doc_name)
-        lib = libraries.get_lib_by_name(libs, library_name, 'write')
-        library.update_module(source, lib, module_name)
+        joined_source = '\n'.join(line.rstrip('\n') for line in source)
+        try:
+            libs[library_name][module_name] = joined_source
+        except KeyError:
+            libs.createLibrary(library_name)
+            libs[library_name][module_name] = joined_source
+
         if save:
-            document.save(doc)
+            doc.store()
+        else:
+            # There doesn't appear to be any way to cause an open Basic editor
+            # to change its save icon to active.
+            # That functionality seems to be semi-broken anyway,
+            # so probably people will be expecting to save the document
+            # in order to be sure.
+            libs.setModified(True)
+            doc.setModified(True)
         return doc
 
     def pull(self, doc_name, library_name, module_name):
@@ -67,8 +83,7 @@ class Exchange:
          '    MsgBox("This is the main macro in Standard.Module1.")',
          'end sub']
         """
-        # TODO: see TODO for `Exchange.push`.
         doc, libs = context.resolve_doc_name(self.context, self.smgr,
                                              self.desktop, doc_name)
-        lib = libraries.get_lib_by_name(libs, library_name, 'read')
-        return library.get_module_source(lib, module_name)
+        lib = libs[library_name][module_name]
+        return (line + "\n" for line in lib.rstrip('\n').split('\n'))

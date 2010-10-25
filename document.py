@@ -1,4 +1,9 @@
-"""Access functions for documents."""
+"""Access functions for documents.
+
+This module, as well as many in the others in this package,
+implements convenience functions that should be factored out
+in favour of proper use of the API.
+"""
 
 def script_name_url(script_name):
     """Returns a URL for a script name like '
@@ -15,7 +20,3 @@ def invoke_macro(doc, script_name):
     provider = doc.getScriptProvider()
     script = provider.getScript(script_name_url(script_name))
     return script.invoke((), (), ())
-
-def save(doc):
-    """Save the document to its location."""
-    doc.store()

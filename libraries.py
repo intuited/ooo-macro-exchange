@@ -1,35 +1,46 @@
 """Functionality related to UNO sequences of libraries."""
-
-class ReadonlyLibraryError(Exception):
-    """Raised if an attempt is made to update a readonly library."""
-    pass
+import library, container
 
 class PasswordProtectionError(Exception):
     """Raised if a password check prevents a library update."""
     pass
 
 
-def get_lib_by_name(libs, library_name, mode='read'):
-    """Get the library named by `library_name`.
+class Libraries(container.name_access):
+    """Represent a libraries container.
 
-    `libraries` is an UNO sequence of libraries,
+    `libraries` is an UNO collection of libraries,
     as returned by `document.get_libraries`.
-
-    If `mode` is 'write',
-    the library is checked for write access.
     """
-    if not libs.hasByName(library_name):
-        libs.createLibrary(library_name)
+    # TODO: add __setitem__, __delitem__, etc.
+    def __init__(self, libraries):
+        self._proxied = libraries
 
-    if mode == 'write':
+    def __getitem__(self, library_name):
+        """Get the library named by `library_name`.
+
+        If the library is readonly, a library.ReadOnlyLibrary is returned.
+        Otherwise, the return is a library.WriteableLibrary.
+
+        PasswordProtectionError will be raised
+        if an attempt is made to access a password-protected library
+        and the password has not been verified.
+        """
+        libs = self._proxied
+
+        if not libs.hasByName(library_name):
+            raise KeyError(library_name)
+
+        if (libs.isLibraryPasswordProtected(library_name)
+            and not libs.isLibraryPasswordVerified(library_name)):
+            raise PasswordProtectionError(library_name)
+
+        if not libs.isLibraryLoaded(library_name):
+            libs.loadLibrary(library_name)
+
+        lib = libs.getByName(library_name)
+
         if libs.isLibraryReadOnly(library_name):
-            raise ReadonlyLibraryError(library_name)
-
-    if (libs.isLibraryPasswordProtected(library_name)
-        and not libs.isLibraryPasswordVerified(library_name)):
-        raise PasswordProtectionError(library_name)
-
-    if not libs.isLibraryLoaded(library_name):
-        libs.loadLibrary(library_name)
-
-    return libs.getByName(library_name)
+            return library.ReadOnlyLibrary(lib)
+        else:
+            return library.WriteableLibrary(lib)
